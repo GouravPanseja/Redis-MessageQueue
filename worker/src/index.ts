@@ -1,14 +1,14 @@
 import { createClient } from "redis";
 
-const client = createClient({
-    url: "redis://redis:6379",
-});
+const client = createClient({ url: "redis://redis:6379"});
 
 (async()=>{
 
     let payload = null;
+
     try{
-        await client.connect();
+        // connect the worker process to redis server 
+        await client.connect(); 
 
         // @ts-ignore
         console.log("Worker succesfull started :", process.pid);
@@ -30,7 +30,6 @@ const client = createClient({
 
         // push the task back into the queue as it was not able to be compeleted succesfully
         await client.lPush("submissions", payload);
-        
     }
 })();
 

@@ -14,35 +14,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const redis_1 = require("redis");
+const wsConnect_1 = __importDefault(require("./utils/wsConnect"));
 const app = (0, express_1.default)();
-app.use(express_1.default.json());
 const client = (0, redis_1.createClient)();
+app.use(express_1.default.json());
 client.on('error', (err) => console.error("Redis Client Error: ", err));
-serverStart();
-app.post("/submit", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const httpServer = app.listen(3000, () => {
+    console.log("Server is running on port 3000");
+});
+(0, wsConnect_1.default)(httpServer, client);
+(() => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { problemId, userId, code, language } = req.body;
-        // store in database 
-        // put in redis to cache the data
-        client.lPush("submissions", JSON.stringify({ problemId, userId, code, language }));
-        res.json({
-            message: "Submission recieved"
-        });
+        yield client.connect();
+        console.log("Connected to Redis");
     }
     catch (err) {
+        console.error("Failed to connect to Redis", err);
     }
-}));
-function serverStart() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            yield client.connect();
-            console.log("Connected to Redis");
-            app.listen(3000, () => {
-                console.log("Server is running on port 3000");
-            });
-        }
-        catch (err) {
-            console.error("Failed to connect to Redis", err);
-        }
-    });
-}
+}))();
