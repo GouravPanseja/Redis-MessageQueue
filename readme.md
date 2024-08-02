@@ -1,1 +1,1 @@
-<img src="/privateAssets/ExcaliBE.png"> </img>
+<img src="/assets/ExcaliBE.png"> </img>
